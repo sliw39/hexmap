@@ -82,15 +82,15 @@ export const HexUtils = {
 
 export const UiUtils = {
     getRect(coord: ICoord, cellSize: number): { x: number, y: number, width: number, height: number } {
-        const cube = coord.toCube();
-        const x = (cube.x + cube.z / 2) * cellSize;
-        const y = cube.z * cellSize * 0.75;
+        const offset = coord.toOffset();
+        const x = offset.x * cellSize + (offset.y % 2 === 0 ? 0 : cellSize / 2);
+        const y = offset.y * cellSize;
         return { x, y, width: cellSize, height: cellSize };
     },
-    pointToCoord(x: number, y: number, cellSize: number): Coord {
-        const q = (x * Math.sqrt(3) / 3 - y / 3) / cellSize;
-        const r = y * 2 / 3 / cellSize;
-        return Coord.a(q, r);
+    pointToCoord(point: {x: number, y: number}, cellSize: number): Coord {
+        const x = Math.floor(point.x / cellSize) - (Math.floor(point.y / cellSize) % 2 === 0 ? 0 : 1);
+        const y = Math.floor(point.y / cellSize);
+        return Coord.o(x, y);
     }
 }
 
