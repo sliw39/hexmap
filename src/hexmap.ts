@@ -126,7 +126,7 @@ export class HexCell<T> implements ICoord {
 }
 
 export class HexMap<T> {
-    #hcells: { [key: string]: HexCell<T> } = {};
+    #acells: { [key: string]: HexCell<T> } = {};
     #ocells: { [key: string]: HexCell<T> } = {};
     #ccells: { [key: string]: HexCell<T> } = {};
 
@@ -158,13 +158,17 @@ export class HexMap<T> {
 
     export(): { [key: string]: T } {
         const result: { [key: string]: T } = {};
-        for (const key in this.#hcells) {
-            const cell = this.#hcells[key];
+        for (const key in this.#acells) {
+            const cell = this.#acells[key];
             if (cell.data) {
                 result[key] = cell.data;
             }
         }
         return result;
+    }
+
+    cells(): HexCell<T>[] {
+        return Object.values(this.#ocells);
     }
 
     getOrCreateHexCell(c: Coord): HexCell<T> {
@@ -177,12 +181,12 @@ export class HexMap<T> {
 
     private get(c: Coord): HexCell<T> | null {
         const key = c.toString();
-        return c instanceof AxialCoord ? this.#hcells[key] : c instanceof OffsetCoord ? this.#ocells[key] : this.#ccells[key];
+        return c instanceof AxialCoord ? this.#acells[key] : c instanceof OffsetCoord ? this.#ocells[key] : this.#ccells[key];
     }
 
     private makeCell(c: Coord, data: T | null): HexCell<T> {
         const cell = new HexCell(c, [], data);
-        this.#hcells[c.toAxial().toString()] = cell;
+        this.#acells[c.toAxial().toString()] = cell;
         this.#ocells[c.toOffset().toString()] = cell;
         this.#ccells[c.toCube().toString()] = cell;
         for(let i = 0; i < 6; i++) {
@@ -198,7 +202,7 @@ export class HexMap<T> {
 
     getData(c: Coord): T | null {
         if(c instanceof AxialCoord) {
-            return this.#hcells[c.toString()]?.data;
+            return this.#acells[c.toString()]?.data;
         } else if(c instanceof OffsetCoord) {
             return this.#ocells[c.toString()]?.data;
         } else if(c instanceof CubeCoord) {
@@ -209,7 +213,7 @@ export class HexMap<T> {
 
     setData(c: Coord, data: T | null): void {
         if(c instanceof AxialCoord) {
-            this.#hcells[c.toString()].data = data;
+            this.#acells[c.toString()].data = data;
         } else if(c instanceof OffsetCoord) {
             this.#ocells[c.toString()].data = data;
         } else if(c instanceof CubeCoord) {

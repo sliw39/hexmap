@@ -4,7 +4,7 @@ import { defineConfig } from 'vite'
 export default defineConfig({
     build: {
         lib: {
-            entry: 'dist/hexmap.js',
+            entry: 'src/hexmap.ts',
             name: 'HexMap',
             fileName: (format) => `hexmap.${format}.js`
         }
