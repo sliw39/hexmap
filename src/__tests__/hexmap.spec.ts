@@ -58,9 +58,9 @@ describe("HexUtils", () => {
             "a9:9": "end",
             "a5:5": "middle"
         });
-        const start = map.getOrCreateHexCell(Coord.parse("a0:0"));
-        const end = map.getOrCreateHexCell(Coord.parse("a1:3"));
-        const path = HexUtils.path(start, end, 20);
+        const start = Coord.parse("a0:0");
+        const end = Coord.parse("a1:3");
+        const path = HexUtils.path(map, start, end, 20);
         expect(path?.length).toBe(5);
         expect(path?.[0].coord.toCube()).toEqual(Coord.parse("c0:-0:0"));
         expect(path?.[1].coord.toCube()).toEqual(Coord.parse("c1:-1:0"));

@@ -28,9 +28,11 @@ export const HexUtils = {
         const cubeB = end.toCube();
         return (Math.abs(cubeA.x - cubeB.x) + Math.abs(cubeA.y - cubeB.y) + Math.abs(cubeA.z - cubeB.z)) / 2;
     },
-    closest<T>(start: HexCell<T>, match: (data: T | null) => boolean, maxLen: number): HexCell<T> | null {
+    closest<T>(hexmap: HexMap<T>, start: Coord, match: (data: T | null) => boolean, maxLen = 100): HexCell<T> | null {
+        const startCell = hexmap.getOrCreateHexCell(start);
+
         const visited: { [key: string]: boolean } = {};
-        const queue: { cell: HexCell<T>, distance: number }[] = [{ cell: start, distance: 0 }];
+        const queue: { cell: HexCell<T>, distance: number }[] = [{ cell: startCell, distance: 0 }];
         while (queue.length > 0) {
             const current = queue.shift();
             if (current) {
@@ -50,14 +52,17 @@ export const HexUtils = {
         }
         return null;
     },
-    path<T>(start: HexCell<T>, end: HexCell<T>, maxLen: number): HexCell<T>[] | null {
+    path<T>(hexmap: HexMap<T>, start: Coord, end: Coord, maxLen = 100): HexCell<T>[] | null {
+        const startCell = hexmap.getOrCreateHexCell(start);
+        const endCell = hexmap.getOrCreateHexCell(end);
+
         const visited: { [key: string]: boolean } = {};
-        const queue: { cell: HexCell<T>, distance: number, path: HexCell<T>[] }[] = [{ cell: start, distance: 0, path: [] }];
+        const queue: { cell: HexCell<T>, distance: number, path: HexCell<T>[] }[] = [{ cell: startCell, distance: 0, path: [] }];
         while (queue.length > 0) {
             const current = queue.shift();
             if (current) {
-                if (current.cell === end) {
-                    current.path.push(end);
+                if (current.cell === endCell) {
+                    current.path.push(endCell);
                     return current.path;
                 }
                 if (current.distance < maxLen) {
@@ -72,11 +77,6 @@ export const HexUtils = {
             }
         }
         return null;
-    },
-    shortestPath<T>(start: HexCell<T>, end: HexCell<T>, maxLen: number, weightEvaluator: (cellFrom: HexCell<T>, currentCell: HexCell<T>) => number): HexCell<T>[] | null {
-        // TODO: implement
-        weightEvaluator(start, end);
-        return HexUtils.path(start, end, maxLen);
     }
 }
 
