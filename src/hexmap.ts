@@ -80,6 +80,20 @@ export const HexUtils = {
     }
 }
 
+export const UiUtils = {
+    getRect(coord: ICoord, cellSize: number): { x: number, y: number, width: number, height: number } {
+        const cube = coord.toCube();
+        const x = (cube.x + cube.z / 2) * cellSize;
+        const y = cube.z * cellSize * 0.75;
+        return { x, y, width: cellSize, height: cellSize };
+    },
+    pointToCoord(x: number, y: number, cellSize: number): Coord {
+        const q = (x * Math.sqrt(3) / 3 - y / 3) / cellSize;
+        const r = y * 2 / 3 / cellSize;
+        return Coord.a(q, r);
+    }
+}
+
 
 export class HexCell<T> implements ICoord {
     #data: T | null;
