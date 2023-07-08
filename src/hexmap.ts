@@ -77,6 +77,13 @@ export const HexUtils = {
             }
         }
         return null;
+    },
+    neighbors<T>(coord: HexCell<T>): HexCell<T>[] {
+        const neighbors: HexCell<T>[] = [];
+        for (let i = 0; i < 6; i++) {
+            neighbors.push(coord.neighbourCell(i));
+        }
+        return neighbors;
     }
 }
 
