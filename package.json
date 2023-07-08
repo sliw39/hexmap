@@ -1,8 +1,8 @@
 {
-  "name": "hexmap",
-  "private": true,
+  "name": "@sliw39/hexmap",
   "version": "0.1.0",
   "type": "module",
+  "main": "src/hexmap.js",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
