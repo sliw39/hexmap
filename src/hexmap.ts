@@ -52,6 +52,57 @@ export const HexUtils = {
         }
         return null;
     },
+    aproximateDirection(start: ICoord, end: ICoord): HexDirection | null {
+        // if the coordinates are the same, there is no direction
+        if (start.toCube().toString() === end.toCube().toString()) {
+            return null;
+        }
+        
+        // first we translate the end as if the start was at 0,0
+        const cubeA = start.toCube();
+        const cubeB = end.toCube();
+        const offsetEnd = Coord.c(cubeB.x - cubeA.x, cubeB.y - cubeA.y, cubeB.z - cubeA.z).toOffset();
+        // we convert the end point to polar coordinates
+        const theta = Math.atan2(offsetEnd.y, offsetEnd.x);
+        // we convert the angle to a direction
+        const direction = (Math.round(theta / 1.05) + 6) % 6;
+        // we convert the direction to a hex direction
+        switch (direction) {
+            case 0:
+                return HexDirection.Right;
+            case 1:
+                return HexDirection.DownRight;
+            case 2:
+                return HexDirection.DownLeft;
+            case 3:
+                return HexDirection.Left;
+            case 4:
+                return HexDirection.UpLeft;
+            case 5:
+                return HexDirection.UpRight;
+            default:
+                throw new Error(`Invalid direction: ${direction}`);
+        }
+    },
+    smartPath<T>(start: HexCell<T>, end: HexCell<T>, maxLen = 100): HexCell<T>[] | null {
+        const path: HexCell<T>[] = [start];
+        let current = start;
+        while (current !== end && maxLen-- > 0) {
+            const direction = HexUtils.aproximateDirection(current, end);
+            if (direction !== null) {
+                const next = current.neighbourCell(direction);
+                if (next) {
+                    path.push(next);
+                    current = next;
+                } else {
+                    return null;
+                }
+            } else {
+                return null;
+            }
+        }
+        return path;
+    },
     path<T>(hexmap: HexMap<T>, start: Coord, end: Coord, maxLen = 100): HexCell<T>[] | null {
         const startCell = hexmap.getOrCreateHexCell(start);
         const endCell = hexmap.getOrCreateHexCell(end);
@@ -81,7 +132,10 @@ export const HexUtils = {
     neighbors<T>(coord: HexCell<T>): HexCell<T>[] {
         const neighbors: HexCell<T>[] = [];
         for (let i = 0; i < 6; i++) {
-            neighbors.push(coord.neighbourCell(i));
+            const cell = coord.neighbourCell(i);
+            if(cell) {
+                neighbors.push(coord.neighbourCell(i));
+            }
         }
         return neighbors;
     }
@@ -106,7 +160,7 @@ export class HexCell<T> implements ICoord {
     #data: T | null;
     #neighbors: HexCell<T>[];
 
-    constructor(public readonly coord: Coord, neighbors: HexCell<T>[], data: T | null) {
+    constructor(public parent: HexMap<T>, public readonly coord: Coord, neighbors: HexCell<T>[], data: T | null) {
         this.#neighbors = neighbors;
         this.#data = data;
      }
@@ -119,6 +173,7 @@ export class HexCell<T> implements ICoord {
         this.#data = value;
     }
 
+    
     neighbourCell(direction: HexDirection): HexCell<T> {
         return this.#neighbors[direction];
     }
@@ -151,11 +206,11 @@ export class HexMap<T> {
     #ocells: { [key: string]: HexCell<T> } = {};
     #ccells: { [key: string]: HexCell<T> } = {};
 
-    constructor(height: number, width: number) {
+    constructor(public readonly height: number, public readonly width: number, dataFactory: (c: Coord) => T | null = () => null) {
         for (let x = 0; x < width; x++) {
             for (let y = 0; y < height; y++) {
                 const c = Coord.o(x, y);
-                this.makeCell(c, null);
+                this.makeCell(c, dataFactory(c));
             }
         }
     }
@@ -206,7 +261,7 @@ export class HexMap<T> {
     }
 
     private makeCell(c: Coord, data: T | null): HexCell<T> {
-        const cell = new HexCell(c, [], data);
+        const cell = new HexCell(this, c, [], data);
         this.#acells[c.toAxial().toString()] = cell;
         this.#ocells[c.toOffset().toString()] = cell;
         this.#ccells[c.toCube().toString()] = cell;

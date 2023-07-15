@@ -1,4 +1,5 @@
 import { HexMap, Coord, HexUtils, HexDirection, UiUtils } from '../hexmap';
+import { describe, expect, it } from 'vitest';
 
 describe('Hexmap', () => {
     it('should create an instance', () => {
@@ -68,6 +69,31 @@ describe("HexUtils", () => {
         expect(path?.[3].coord.toCube()).toEqual(Coord.parse("c1:-3:2"));
         expect(path?.[4].coord.toCube()).toEqual(Coord.parse("c1:-4:3"));
         expect(path?.[4].coord.toAxial()).toEqual(Coord.parse("a1:3"));
+    });
+
+    it("should get the correct direction between two coordinates", () => {
+        /* perfect directions */
+        expect(HexUtils.aproximateDirection(Coord.parse("o5:5"), Coord.parse("o5:5"))).toBe(null);
+        expect(HexUtils.aproximateDirection(Coord.parse("o5:5"), Coord.parse("o0:5"))).toBe(HexDirection.Left);
+        expect(HexUtils.aproximateDirection(Coord.parse("o5:5"), Coord.parse("o10:5"))).toBe(HexDirection.Right);
+        expect(HexUtils.aproximateDirection(Coord.parse("o5:5"), Coord.parse("o0:0"))).toBe(HexDirection.UpLeft);
+        expect(HexUtils.aproximateDirection(Coord.parse("o5:5"), Coord.parse("o10:0"))).toBe(HexDirection.UpRight);
+        expect(HexUtils.aproximateDirection(Coord.parse("o5:5"), Coord.parse("o0:10"))).toBe(HexDirection.DownLeft);
+        expect(HexUtils.aproximateDirection(Coord.parse("o5:5"), Coord.parse("o10:10"))).toBe(HexDirection.DownRight);
+
+        /* imperfect directions */
+        expect(HexUtils.aproximateDirection(Coord.parse("o5:5"), Coord.parse("o10:7"))).toBe(HexDirection.Right);
+        expect(HexUtils.aproximateDirection(Coord.parse("o5:5"), Coord.parse("o10:3"))).toBe(HexDirection.Right);
+        expect(HexUtils.aproximateDirection(Coord.parse("o5:5"), Coord.parse("o0:7"))).toBe(HexDirection.Left);
+        expect(HexUtils.aproximateDirection(Coord.parse("o5:5"), Coord.parse("o0:3"))).toBe(HexDirection.Left);
+        expect(HexUtils.aproximateDirection(Coord.parse("o5:5"), Coord.parse("o10:8"))).toBe(HexDirection.DownRight);
+        expect(HexUtils.aproximateDirection(Coord.parse("o5:5"), Coord.parse("o8:10"))).toBe(HexDirection.DownRight);
+        expect(HexUtils.aproximateDirection(Coord.parse("o5:5"), Coord.parse("o2:0"))).toBe(HexDirection.UpLeft);
+        expect(HexUtils.aproximateDirection(Coord.parse("o5:5"), Coord.parse("o0:2"))).toBe(HexDirection.UpLeft);
+        expect(HexUtils.aproximateDirection(Coord.parse("o5:5"), Coord.parse("o2:10"))).toBe(HexDirection.DownLeft);
+        expect(HexUtils.aproximateDirection(Coord.parse("o5:5"), Coord.parse("o0:8"))).toBe(HexDirection.DownLeft);
+        expect(HexUtils.aproximateDirection(Coord.parse("o5:5"), Coord.parse("o8:0"))).toBe(HexDirection.UpRight);
+        expect(HexUtils.aproximateDirection(Coord.parse("o5:5"), Coord.parse("o10:2"))).toBe(HexDirection.UpRight);
     });
 });
 

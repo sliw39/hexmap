@@ -1,0 +1,42 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"name": "hexmap",
+			"path": "."
+		},
+		{
+			"name": "hexwar-ui",
+			"path": "../hexwar-ui"
+		},
+		{
+			"name": "hexwar",
+			"path": "../hexwar"
+		},
+		{
+			"name": "temp",
+			"path": "../common/temp"
+		},
+		{
+			"name": "@microsoft+rush@5.100.1",
+			"path": "../common/temp/install-run/@microsoft+rush@5.100.1"
+		},
+		{
+			"name": "pnpm-local",
+			"path": "../common/temp/pnpm-local"
+		}
+	],
+	"settings": {
+		"jest.disabledWorkspaceFolders": [
+			"hexwar-workspace",
+			"hexwar-ui",
+			"hexwar",
+			"temp",
+			"@microsoft+rush@5.100.1",
+			"pnpm-local"
+		],
+		"testing.automaticallyOpenPeekView": "never"
+	}
+}
