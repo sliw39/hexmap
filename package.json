@@ -2,10 +2,10 @@
   "name": "@sliw39/hexmap",
   "version": "0.1.0",
   "type": "module",
-  "main": "src/hexmap.js",
+  "main": "src/main.js",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "test": "vitest",
     "preview": "vite preview"
   },
