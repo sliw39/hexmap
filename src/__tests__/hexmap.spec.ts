@@ -35,15 +35,16 @@ describe('Hexmap', () => {
             "a9:9": "end",
             "a5:5": "middle"
         });
+        console.log(Coord.parse("a5:5").toOffset());
         expect(map.getData(Coord.parse("a0:0"))).toBe("origin");
         expect(map.getData(Coord.parse("a9:9"))).toBe("end");
         expect(map.getData(Coord.parse("a5:5"))).toBe("middle");
         expect(map.getData(Coord.parse("c0:0:0"))).toBe("origin");
-        expect(map.getData(Coord.parse("c9:-18:9"))).toBe("end");
-        expect(map.getData(Coord.parse("c5:-10:5"))).toBe("middle");
+        expect(map.getData(Coord.parse("c9:9:-18"))).toBe("end");
+        expect(map.getData(Coord.parse("c5:5:-10"))).toBe("middle");
         expect(map.getData(Coord.parse("o0:0"))).toBe("origin");
-        expect(map.getData(Coord.parse("o9:9"))).toBe("end");
-        expect(map.getData(Coord.parse("o5:5"))).toBe("middle");
+        expect(map.getData(Coord.parse("o13:9"))).toBe("end");
+        expect(map.getData(Coord.parse("o7:5"))).toBe("middle");
     });
 });
 

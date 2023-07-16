@@ -2,7 +2,8 @@
 import { describe, it, expect } from "vitest";
 import { Coord, HexDirection } from "../coords";
 import { HexUtils } from "../utils";
-import { HexCell, HexMap } from "../models";
+import { HexMap } from "../models";
+import { matrixToHexmap, printPath } from "./testUtils";
 
 
 describe("HexUtils", () => {
@@ -54,26 +55,7 @@ describe("HexUtils", () => {
 });
 
 
-function matrixToHexmap(matrix: number[][]): HexMap<number> {
-    return new HexMap<number>(
-        matrix.length, 
-        matrix[0].length, 
-        (cell) => matrix[cell.toOffset().y][cell.toOffset().x]
-    );
-}
-function printPath<T>(matrix : number[][], path: HexCell<T>[]) {
-    const pathMatrix = matrix.map((row) => row.map((cell) => cell + ""));
-    path.forEach((cell, index) => {
-        const coord = cell.coord.toOffset();
-        pathMatrix[coord.y][coord.x] = index === 0 ? "S" : ( index === path.length-1 ? "E": "X");
-    });
-    pathMatrix.forEach((row, index) => {
-        if (index % 2 === 1) {
-            row.unshift("");
-        }
-    });
-    return pathMatrix.map((row) => row.join(",")).join("\n");
-}
+
 describe("HexUtils.weightedPath()", () => {
     it("should find the shortest path", () => {
         const matrix = [

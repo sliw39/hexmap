@@ -186,6 +186,81 @@ export const UiUtils = {
         const x = Math.floor(point.x / cellSize) - (Math.floor(point.y / cellSize) % 2 === 0 ? 0 : 1);
         const y = Math.floor(point.y / cellSize);
         return Coord.o(x, y);
+    },
+    generateBumbmap(width: number, height: number, details: number): HexMap<number> {
+        // we compute the resolution needed
+        const resolution = Math.ceil(Math.log2(Math.max(width, height)));
+
+        // fractal generation
+        const iterate = (cell: number, resolution: number): number[][] => {
+            const division: number[][] = [
+                [cell + (details * (Math.random() - .5)), cell + (details * (Math.random() - .5))], 
+                [cell + (details * (Math.random() - .5)), cell + (details * (Math.random() - .5))]
+            ];
+            if(resolution > 0) {
+                const newMatrix: number[][] = [];
+                for(let i = 0; i < 2; i++) {
+                    for(let j = 0; j < 2; j++) {
+                        const result = iterate(division[i][j], resolution - 1);
+                        for(let k = 0; k < result.length; k++) {
+                            for(let l = 0; l < result[k].length; l++) {
+                                newMatrix[i * result.length + k] = newMatrix[i * result.length + k] || [];
+                                newMatrix[i * result.length + k][j * result[k].length + l] = result[k][l];
+                            }
+                        }
+
+                    }
+                }
+                return newMatrix;
+            } else {
+                return division;
+            }
+        }
+
+        // normalize the matrix to have each cell between 0 and 1
+        const normalize = (matrix: number[][]) => {
+            const min = matrix.reduce((acc, row) => Math.min(acc, ...row), Infinity);
+            const max = matrix.reduce((acc, row) => Math.max(acc, ...row), -Infinity);
+            if(min === max) return;
+            matrix.forEach((row, y) => {
+                row.forEach((cell, x) => {
+                    matrix[y][x] = (cell - min) / (max - min);
+                });
+            });
+        }
+
+        const smooth = (matrix: number[][], smoothness: number) => {
+            const newMatrix: number[][] = [];
+            for(let y = 0; y < matrix.length; y++) {
+                for(let x = 0; x < matrix[y].length; x++) {
+                    const neighbors = [
+                        matrix[y-1]?.[x-1],
+                        matrix[y-1]?.[x],
+                        matrix[y-1]?.[x+1],
+                        matrix[y]?.[x-1],
+                        matrix[y]?.[x+1],
+                        matrix[y+1]?.[x-1],
+                        matrix[y+1]?.[x],
+                        matrix[y+1]?.[x+1],
+                    ].filter((cell) => cell !== undefined);
+                    const sum = neighbors.reduce((acc, cell) => acc + cell, 0);
+                    const avg = sum / neighbors.length;
+                    newMatrix[y] = newMatrix[y] || [];
+                    newMatrix[y][x] = matrix[y][x] * (1 - smoothness) + avg * smoothness;
+                }
+            }
+            return newMatrix;
+        }
+
+        // we generate the matrix
+        const matrix = iterate(Math.random(), resolution);
+        // we smooth the matrix
+        // smooth(matrix, .5);
+        // we normalize the matrix
+        normalize(matrix);
+        // we return the hexmap
+        return new HexMap<number>(width, height, (cell) => matrix[cell.toOffset().y][cell.toOffset().x]);
     }
+
 }
 
